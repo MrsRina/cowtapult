@@ -1,3 +1,6 @@
+# Compiled CMake makes
+/cmake-build-debug
+
 # Prerequisites
 *.d
 
@@ -30,3 +33,5 @@
 *.exe
 *.out
 *.app
+
+/bin/cowtapult
