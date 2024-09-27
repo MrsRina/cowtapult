@@ -1,5 +1,6 @@
 #include "handler.hpp"
 #include "client.hpp"
+#include <bicudo/util/math.hpp>
 
 ct::flags ct::gpu_handler::media_window_flags {
   SDL_WINDOW_OPENGL
