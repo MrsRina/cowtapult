@@ -1,3 +1,6 @@
+# Sublime-Text Project files
+*.sublime-workspace
+
 # Compiled CMake makes
 /cmake-build-debug
 
