@@ -4,7 +4,9 @@
 #include <cstdint>
 #include "io/trace.hpp"
 #include <vector>
+#include <unordered_map>
 #include <string_view>
+#include <bicudo/gpu/types.hpp>
 
 namespace ct {
   struct program_t {

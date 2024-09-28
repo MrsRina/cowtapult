@@ -8,10 +8,15 @@ namespace ct {
   public:
     bicudo::physics::placement placement {};
   public:
+    entity_base() = default;
+    entity_base(bicudo::physics::placement _placement) : placement(_placement) {
+      // meow
+    };
+
     virtual void on_spawn() {};
     virtual void on_dead() {};
-    virtual void on_update() {};
-    virtual void on_render() {};
+    virtual void on_update();
+    virtual void on_render();
   };
 }
 

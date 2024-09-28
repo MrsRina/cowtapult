@@ -7,7 +7,7 @@ ct::result ct::gpu_create_program(
   ct::program_create_info *p_program_create_info,
   ct::program_t *p_program
 ) {
-  if (p_program->shader_list.empty()) {
+  if (p_program_create_info->shader_list.empty()) {
     bicudo::log() << "Error: Invalid shader, empty resources";
     return bicudo::types::FAILED;
   }
@@ -17,7 +17,7 @@ ct::result ct::gpu_create_program(
   int32_t status {};
   std::string msg {};
 
-  for (ct::shader_t &module : p_program->shader_list) {
+  for (ct::shader_t &module : p_program_create_info->shader_list) {
     uint32_t shader {glCreateShader(module.stage)};
     glShaderSource(shader, 1, &module.p_src, nullptr);
     glCompileShader(shader);
@@ -34,7 +34,7 @@ ct::result ct::gpu_create_program(
     compiled_shader_list.push_back(shader);
   }
 
-  bool keep {compiled_shader_list.size() == shader_list.size()};
+  bool keep {compiled_shader_list.size() == p_program_create_info->shader_list.size()};
   p_program->id = glCreateProgram();
 
   for (uint32_t &shaders : compiled_shader_list) {
@@ -76,11 +76,11 @@ ct::result ct::gpu_uniform_registry(
   };
 
   if (location == -1) {
-    return ct::result::FAILED;
+    return ct::results::FAILED;
   }
 
   p_program->program_location_map[key] = location;
-  return ct::result::SUCCESS;
+  return ct::results::SUCCESS;
 }
 
 ct::result ct::gpu_dispatch_draw_call(

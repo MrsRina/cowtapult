@@ -9,7 +9,6 @@ namespace ct {
   struct window_t {
   public:
     SDL_Window *p_sdl_win {};
-    SDL_GLContext sdl_gl_context {};
     const char *p_title {};
     int32_t w {};
     int32_t h {};

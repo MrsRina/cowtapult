@@ -18,6 +18,21 @@ ct::result ct::media_create_window(
     )
   );
 
+  SDL_SetWindowSize(
+    p_window->p_sdl_win,
+    --p_window_create_info->w,
+    --p_window_create_info->h
+  );
+
+  SDL_SetWindowSize(
+    p_window->p_sdl_win,
+    ++p_window_create_info->w,
+    ++p_window_create_info->h
+  );
+
+  p_window->w = p_window_create_info->w;
+  p_window->h = p_window_create_info->h;
+
   return ct::results::SUCCESS;
 }
 

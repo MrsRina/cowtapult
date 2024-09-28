@@ -10,7 +10,9 @@ namespace ct {
   public:
     static ct::flags media_window_flags;
   public:
+    SDL_GLContext sdl_gl_context {};
     ct::immediate immediate {};
+    bicudo::vec3 bg_color {};
   public:
     void init_sdl_attributes();
     void init_gl_context();

@@ -1,7 +1,6 @@
 #include "immediate.hpp"
-#include "model.hpp"
 
-void ct::immmediate::create() {
+void ct::immediate::create() {
   ct::program_create_info program_create_info {
     .p_tag = "immediate",
     .shader_list =
@@ -9,6 +8,7 @@ void ct::immmediate::create() {
       {
         .stage = GL_VERTEX_SHADER,
         .p_src = R"(
+
         #version 450 core
 
         layout (location = 0) in vec2 aPos; 
@@ -100,28 +100,15 @@ void ct::immmediate::create() {
   glBindVertexArray(0);
 }
 
-void ct::immmediate::update_viewport() {
-  float w {static_cast<float>(ct::p_app->window.w)};
-  float h {static_cast<float>(ct::p_app->window.h)};
+void ct::immediate::invoke() {
+  glUseProgram(this->program.id);
+  glBindVertexArray(this->draw_call.vao);
 
-  this->mat4x4_projection = bicudo::ortho(
-    0.0f,
-    w,
-    h,
-    0.0f
-  );
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  ct::camera &camera {ct::p_app->camera};
-  bicudo::vec2 center {w / 2, h / 2}; // RINA PLEASE ADD DYNAMIC ZOOM FOR TARGET ENTITIES
-
-  bicudo::vec2 delta {(center / this->current_zoom) + camera.placement.pos};
-  this->current_zoom = camera.zoom;
-  camera.placement.pos = delta - (center / this->current_zoom);
-
-  this->mat4x4_projection = bicudo::scale(this->mat4x4_projection, {this->current_zoom, this->current_zoom, 1.0f});
-
-  glProgramUniformMatrix4fv(
-    this->program.id,
+  glUniformMatrix4fv(
     this->program["uProjection"],
     1,
     GL_FALSE,
@@ -129,32 +116,22 @@ void ct::immmediate::update_viewport() {
   );
 }
 
-void ct::immmediate::invoke() {
-  glUseProgram(this->program.id);
-  glBindVertexArray(this->draw_call.vao);
-
-  glDisable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-void ct::immmediate::draw(
-  bicudo::vec4 rect,
+void ct::immediate::draw(
+  bicudo::physics::placement &placement,
   bicudo::vec4 color,
-  float angle,
   uint32_t bind_texture
 ) {
   this->mat4x4_rotate = bicudo::mat4(1.0f);
 
-  if (!bicudo::assert_float(angle, 0.0f)) {
+  if (!bicudo::assert_float(placement.angle, 0.0f)) {
     bicudo::vec2 center {
-      rect.x + (rect.z / 2), rect.y + (rect.w / 2)
+      placement.pos.x + (placement.size.x / 2), placement.pos.y + (placement.size.y / 2)
     };
 
     this->mat4x4_rotate = bicudo::translate(this->mat4x4_rotate, center);
-    this->mat4x4_rotate = bicudo::rotate(this->mat4x4_rotate, {0.0f, 0.0f, 1.0f}, -angle);
+    this->mat4x4_rotate = bicudo::rotate(this->mat4x4_rotate, {0.0f, 0.0f, 1.0f}, -placement.angle);
     this->mat4x4_rotate = bicudo::translate(this->mat4x4_rotate, -center);
-  }
+  }  
 
   glUniformMatrix4fv(
     this->program["uRotate"],
@@ -163,10 +140,19 @@ void ct::immmediate::draw(
     this->mat4x4_rotate.data()
   );
 
-  glUniform4fv(
+  bicudo::vec4 rect {
+    placement.pos.x,
+    placement.pos.y,
+    placement.size.x,
+    placement.size.y
+  };
+
+  glUniform4f(
     this->program["uRect"],
-    1,
-    rect.data()
+    placement.pos.x,
+    placement.pos.y,
+    placement.size.x,
+    placement.size.y
   );
 
   glUniform4fv(
@@ -188,7 +174,7 @@ void ct::immmediate::draw(
   ct::gpu_dispatch_draw_call(&this->draw_call);
 }
 
-void ct::immmediate::revoke() {
+void ct::immediate::revoke() {
   glUseProgram(0);
   glBindVertexArray(0);
 }
