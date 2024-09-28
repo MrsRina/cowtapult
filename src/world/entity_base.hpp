@@ -9,11 +9,14 @@ namespace ct {
   public:
     bicudo::physics::placement placement {};
     ct::pickup_type pickup_type {ct::pickup_type::NONE};
+    bicudo::id texture_id {};
   public:
     entity_base() = default;
     entity_base(bicudo::physics::placement _placement) : placement(_placement) {
       // meow
     };
+
+    void set_texuture(bicudo::id id);
 
     virtual void on_spawn() {};
     virtual void on_dead() {};

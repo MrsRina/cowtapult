@@ -114,6 +114,8 @@ void ct::immediate::invoke() {
     GL_FALSE,
     this->mat4x4_projection.data()
   );
+
+  glActiveTexture(GL_TEXTURE0);
 }
 
 void ct::immediate::draw(
@@ -131,7 +133,7 @@ void ct::immediate::draw(
     this->mat4x4_rotate = bicudo::translate(this->mat4x4_rotate, center);
     this->mat4x4_rotate = bicudo::rotate(this->mat4x4_rotate, {0.0f, 0.0f, 1.0f}, -placement.angle);
     this->mat4x4_rotate = bicudo::translate(this->mat4x4_rotate, -center);
-  }  
+  }
 
   glUniformMatrix4fv(
     this->program["uRotate"],
@@ -161,14 +163,19 @@ void ct::immediate::draw(
     color.data()
   );
 
-  if (bind_texture > 0) {
+  if (bind_texture > 0 || bind_texture == this->was_sampler_activated) {
     glUniform1i(
       this->program["uSamplerEnabled"],
       true
     );
 
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, bind_texture);
+    this->was_sampler_activated = bind_texture;
+  } else if (bind_texture == 0 && this->was_sampler_activated != 0) {
+    glUniform1i(
+      this->program["uSamplerEnabled"],
+      false
+    );
   }
 
   ct::gpu_dispatch_draw_call(&this->draw_call);

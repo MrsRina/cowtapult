@@ -70,6 +70,8 @@ void ct::tools_update_picked_camera(
     -((interact.y - p_pickup_info->delta.y) - (p_pickup_info->prev_pos.y - p_pickup_info->delta.y))
   };
 
+  p_pickup_info->p_placement->velocity *= (5.0f * bicudo_clamp_min(1.0f - ct::p_app->camera.zoom, 0.1f));
+
   p_pickup_info->prev_pos.x = interact.x;
   p_pickup_info->prev_pos.y = interact.y;
 }
@@ -133,6 +135,7 @@ void ct::tools_update_picked_object(
 
     p_pickup_info->p_placement->velocity = {};
   }
+  p_pickup_info->p_placement->acc = {};
 
   p_pickup_info->prev_pos.x = interact.x;
   p_pickup_info->prev_pos.y = interact.y;

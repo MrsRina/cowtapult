@@ -8,6 +8,7 @@
 namespace ct {
   class immediate {
   protected:
+    uint32_t was_sampler_activated {};
     ct::program_t program {};
     ct::draw_call_t draw_call {};
     bicudo::mat4 mat4x4_rotate {};

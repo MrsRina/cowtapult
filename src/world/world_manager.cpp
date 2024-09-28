@@ -17,13 +17,19 @@ ct::entity_base *ct::world_manager::push_back_entity(
 
 void ct::world_manager::on_load() {
   ct::p_app->camera.set_target(nullptr);
-  ct::p_app->bicudo_runtime.gravity = {0.0f, 9.0f};
+  ct::p_app->bicudo_runtime.gravity = {0.0f, 4.81f};
+
+  bicudo::id dog_sampler {
+    ct::p_app->texture_manager.upload(
+      "dog", "./dog.png"
+    )
+  };
 
   ct::entity_player *p_cow {
     new ct::entity_player(
       {
         .p_tag = "vakinha",
-        .mass = 2000.0f,
+        .mass = 20.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
         .pos = {20, 20},
@@ -32,6 +38,7 @@ void ct::world_manager::on_load() {
     )
   };
 
+  p_cow->set_texuture(dog_sampler);
   p_cow->pickup_type = ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_cow);
 
@@ -48,7 +55,8 @@ void ct::world_manager::on_load() {
     )
   };
 
-  p_cow->pickup_type = ct::pickup_type::SLINGSHOT;
+  p_cow_2->set_texuture(dog_sampler);
+  p_cow_2->pickup_type = ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_cow_2);
 
   ct::entity_base *p_terrain_bottom {

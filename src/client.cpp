@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <iostream>
+#include <chrono>
 #include "client.hpp"
 
 #include <ekg/os/ekg_sdl.hpp>
@@ -46,8 +47,6 @@ void ct::init() {
     &ct::p_app->bicudo_runtime
   );
 
-  ct::p_app->world_manager.on_load();
-
   ekg::runtime_property ekg_runtime_property {
     .p_font_path = "./ComicMono.ttf",
     .p_font_path_emoji = "./twemoji.ttf",
@@ -60,6 +59,7 @@ void ct::init() {
     &ekg_runtime_property
   );
 
+  ct::p_app->world_manager.on_load();
   ct::p_app->gui_manager.init();
 }
 
@@ -75,6 +75,14 @@ int32_t ct::run() {
   ct::p_app->running  = true;
   ekg::timing framerate_time_stamp {};
   bicudo::current_framerate = 60;
+  bicudo::dt = 0.16f;
+
+  double fixed_time {16};
+  double max_frame_time {0.25};
+  double previous_ticks {SDL_GetTicks64()};
+  double current_ticks {};
+  double frame_time {};
+  double accumulator {};
 
   while (ct::p_app->running) {
     while (SDL_PollEvent(&ct::p_app->sdl_event)) {
@@ -100,7 +108,16 @@ int32_t ct::run() {
       ct::p_app->gui_manager.on_poll_event();
     }
 
-    ct::p_app->world_manager.on_update();
+    current_ticks = SDL_GetTicks64();    
+    frame_time = std::chrono::duration<double>(current_ticks - previous_ticks).count();
+    previous_ticks = current_ticks;
+
+    accumulator += frame_time;
+    while (accumulator >= fixed_time) {
+      ct::p_app->world_manager.on_update();
+      accumulator -= fixed_time;
+    }
+
     ct::p_app->gui_manager.on_update();
     ekg::update();
 
@@ -110,10 +127,7 @@ int32_t ct::run() {
     }
 
     if (ekg::reach(framerate_time_stamp, 1000) && ekg::reset(framerate_time_stamp)) {
-      ekg::ui::dt = (
-        bicudo::dt = 1.0f / bicudo::current_framerate
-      );
-
+      ekg::ui::dt = 1.0f / bicudo::current_framerate;
       bicudo::framerate = bicudo::current_framerate;
       bicudo::current_framerate = 0;
     }

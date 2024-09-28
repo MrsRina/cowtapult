@@ -3,6 +3,7 @@
 
 #include <bicudo/bicudo.hpp>
 #include "media/window.hpp"
+#include "media/texture_manager.hpp"
 #include "gpu/handler.hpp"
 #include "world/world_manager.hpp"
 #include "world/camera.hpp"
@@ -12,6 +13,7 @@ namespace ct {
   extern struct application_t {
   public:
     bicudo::runtime bicudo_runtime {};
+    ct::texture_manager texture_manager {};
     ct::gui_manager gui_manager {};
     ct::window_t window {};
     ct::world_manager world_manager {};
