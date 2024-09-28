@@ -16,7 +16,8 @@ ct::entity_base *ct::world_manager::push_back_entity(
 }
 
 void ct::world_manager::on_load() {
-  ct::p_app->camera.set_target(nullptr);  
+  ct::p_app->camera.set_target(nullptr);
+  ct::p_app->bicudo_runtime.gravity = {0.0f, 9.0f};
 
   ct::entity_player *p_cow {
     new ct::entity_player(
@@ -31,6 +32,7 @@ void ct::world_manager::on_load() {
     )
   };
 
+  p_cow->pickup_type = ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_cow);
 
   ct::entity_player *p_cow_2 {
@@ -46,6 +48,7 @@ void ct::world_manager::on_load() {
     )
   };
 
+  p_cow->pickup_type = ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_cow_2);
 
   ct::entity_base *p_terrain_bottom {
@@ -55,12 +58,13 @@ void ct::world_manager::on_load() {
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
-        .pos = {200, 800},
-        .size = {1280, 50}
+        .pos = {-600, 800},
+        .size = {1920, 50}
       }
     )
   };
 
+  p_terrain_bottom->pickup_type = ct::pickup_type::DRAG;
   this->push_back_entity(p_terrain_bottom);
 
   ct::entity_base *p_terrain_top {
@@ -70,12 +74,13 @@ void ct::world_manager::on_load() {
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
-        .pos = {200, 200},
-        .size = {1280, 50}
+        .pos = {600, 800},
+        .size = {1920, 50}
       }
     )
   };
 
+  p_terrain_top->pickup_type = ct::pickup_type::DRAG;
   this->push_back_entity(p_terrain_top);
 
   ct::entity_base *p_terrain_left {
@@ -85,12 +90,13 @@ void ct::world_manager::on_load() {
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
-        .pos = {200, 200},
+        .pos = {-600, 200},
         .size = {50, 1280}
       }
     )
   };
 
+  p_terrain_left->pickup_type = ct::pickup_type::DRAG;
   this->push_back_entity(p_terrain_left);
 
   ct::entity_base *p_terrain_right {
@@ -100,12 +106,13 @@ void ct::world_manager::on_load() {
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
-        .pos = {900, 200},
+        .pos = {600 + 1920, 200},
         .size = {50, 1280}
       }
     )
   };
 
+  p_terrain_right->pickup_type = ct::pickup_type::DRAG;
   this->push_back_entity(p_terrain_right);
 }
 
@@ -126,6 +133,10 @@ void ct::world_manager::on_update() {
   for (ct::entity_base *&p_entity_base : this->loaded_entity_list) {
     p_entity_base->on_update();
   }
+
+  bicudo::update_collisions(
+    &ct::p_app->bicudo_runtime
+  );
 
   ct::p_app->camera.on_update();
 }

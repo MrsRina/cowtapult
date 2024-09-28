@@ -38,13 +38,13 @@ void ct::gpu_handler::update_viewport() {
     0.0f
   );
 
+  ct::p_app->camera.look_at -= ct::p_app->camera.placement.pos;
+
   bicudo::vec2 delta {
     (ct::p_app->camera.look_at / ct::p_app->camera.previous_zoom)
     +
     (ct::p_app->camera.placement.pos)
   };
-
-  ct::p_app->camera.look_at -= ct::p_app->camera.placement.pos;
 
   ct::p_app->camera.previous_zoom = ct::p_app->camera.zoom;
   ct::p_app->camera.placement.pos = (

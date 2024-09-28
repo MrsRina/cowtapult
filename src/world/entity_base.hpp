@@ -2,11 +2,13 @@
 #define CT_WORLD_ENTITY_BASE_HPP
 
 #include <bicudo/physics/placement.hpp>
+#include "io/game_context.hpp"
 
 namespace ct {
   class entity_base {
   public:
     bicudo::physics::placement placement {};
+    ct::pickup_type pickup_type {ct::pickup_type::NONE};
   public:
     entity_base() = default;
     entity_base(bicudo::physics::placement _placement) : placement(_placement) {

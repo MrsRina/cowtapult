@@ -38,6 +38,10 @@ void ct::init() {
   ct::p_app->window.p_cpu_interval = &bicudo::cpu_interval_ms;
   ct::p_app->gpu_handler.init_gl_context();
 
+  ct::p_app->bicudo_runtime = {
+    .physics_runtime_type = bicudo::physics_runtime_type::CPU_SIDE
+  };
+
   bicudo::init(
     &ct::p_app->bicudo_runtime
   );

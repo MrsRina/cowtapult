@@ -2,6 +2,7 @@
 #define CT_TOOLS_PICKUP_HPP
 
 #include "bicudo/physics/placement.hpp"
+#include "io/game_context.hpp"
 
 namespace ct {
   struct pickup_info_t {
@@ -10,6 +11,7 @@ namespace ct {
     bicudo::vec2 pick_pos {};
     bicudo::vec2 prev_pos {};
     bicudo::physics::placement *p_placement {};
+    ct::pickup_type pickup_type {};
   };
 }
 

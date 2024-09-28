@@ -6,6 +6,12 @@ namespace ct {
     FREE,
     TARGET 
   };
+
+  enum pickup_type {
+    NONE,
+    DRAG,
+    SLINGSHOT
+  };
 }
 
 #endif
