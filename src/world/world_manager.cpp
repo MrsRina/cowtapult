@@ -4,6 +4,28 @@
 #include <bicudo/bicudo.hpp>
 #include "entity_player.hpp"
 
+void ct::on_event_collision_pre_apply_forces(
+  bicudo::physics::placement *&p_a,
+  bicudo::physics::placement *&p_b
+) {
+  if (p_a->p_tag[0] == 'T' || p_b->p_tag[0] == 'T') {
+    return;
+  }
+
+  float power {
+    (p_a->velocity * p_a->mass).magnitude()
+  };
+
+  float resist {
+    (p_b->velocity * p_b->mass).magnitude() * (p_b->mass)
+  };
+
+  if (p_a->mass > p_b->mass && power > resist) {
+    std::cout << "oi eu amo gatos e vacas" << std::endl;
+    std::cout << power << ", " << resist << std::endl;
+  }
+}
+
 ct::entity_base *ct::world_manager::push_back_entity(
   ct::entity_base *p_entity_base
 ) {
@@ -17,8 +39,10 @@ ct::entity_base *ct::world_manager::push_back_entity(
 }
 
 void ct::world_manager::on_load() {
+  ct::p_app->bicudo_runtime.p_on_collision_pre_apply_forces = &ct::on_event_collision_pre_apply_forces;
   ct::p_app->camera.set_target(nullptr);
   ct::p_app->bicudo_runtime.gravity = {0.0f, 9.81f};
+  ct::p_app->bicudo_runtime.solve_accurace = 0.4f;
 
   ct::texture_upload_properties_t upload_texture_properties {
     .p_tag = "dog",
@@ -78,9 +102,9 @@ void ct::world_manager::on_load() {
     new ct::entity_player(
       {
         .p_tag = "vakinha",
-        .mass = 20.0f,
-        .friction = 0.1f,
-        .restitution = 0.2f,
+        .mass = 60.0f,
+        .friction = 0.6f,
+        .restitution = 0.1f,
         .pos = {20, 20},
         .size = {144, 144}
       }
@@ -95,7 +119,7 @@ void ct::world_manager::on_load() {
     new ct::entity_player(
       {
         .p_tag = "sopa",
-        .mass = 20.0f,
+        .mass = 40.0f,
         .friction = 0.1f,
         .restitution = 0.2f,
         .pos = {20, 20},
@@ -112,7 +136,7 @@ void ct::world_manager::on_load() {
     new ct::entity_player(
       {
         .p_tag = "gatinho",
-        .mass = 20.0f,
+        .mass = 2.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
         .pos = {200, 20},
@@ -129,7 +153,7 @@ void ct::world_manager::on_load() {
   ct::entity_base *p_terrain_bottom {
     new ct::entity_base(
       {
-        .p_tag = "terrain-bottom",
+        .p_tag = "T",
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
@@ -146,7 +170,7 @@ void ct::world_manager::on_load() {
   ct::entity_base *p_terrain_top {
     new ct::entity_base(
       {
-        .p_tag = "terrain-top",
+        .p_tag = "T",
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
@@ -162,7 +186,7 @@ void ct::world_manager::on_load() {
   ct::entity_base *p_terrain_left {
     new ct::entity_base(
       {
-        .p_tag = "terrain-left",
+        .p_tag = "T",
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
@@ -178,7 +202,7 @@ void ct::world_manager::on_load() {
   ct::entity_base *p_terrain_right {
     new ct::entity_base(
       {
-        .p_tag = "terrain-right",
+        .p_tag = "T",
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,

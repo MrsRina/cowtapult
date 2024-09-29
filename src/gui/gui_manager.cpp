@@ -8,7 +8,7 @@ void ct::gui_manager::init() {
   ekg::input::bind("click-on-camera", "mouse-2");
   ekg::input::bind("drop-camera", "mouse-2-up");
   ekg::input::bind("zoom-camera", "mouse-wheel");
-  ekg::input::bind("target-entity", "space");
+  ekg::input::bind("target-entity", "space-up");
 
   ekg::frame("oiii muuu", {20, static_cast<float>(ct::p_app->window.h) - 700}, {400, 400})
     ->set_resize(ekg::dock::left | ekg::dock::bottom | ekg::dock::right | ekg::dock::top)
@@ -74,6 +74,8 @@ void ct::gui_manager::on_poll_event() {
     };
 
     uint64_t it {this->entity_target_sequence};
+    uint64_t initial_it {this->entity_target_sequence};
+
     for (it = this->entity_target_sequence; it < size; it++) {
       ct::entity_base *&p_entity {
         ct::p_app->world_manager.loaded_entity_list.at(it)
@@ -83,11 +85,12 @@ void ct::gui_manager::on_poll_event() {
         this->entity_target_sequence = it;
         ct::p_app->camera.set_target(&p_entity->placement);
         this->entity_target_sequence++;
+
         break;
       }
     }
 
-    if (it == size) {
+    if (this->entity_target_sequence == initial_it) {
       ct::p_app->camera.set_target(nullptr);
       this->entity_target_sequence = 0;
       return;

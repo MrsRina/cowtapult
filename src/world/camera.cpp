@@ -40,7 +40,6 @@ void ct::camera::on_update() {
 
     this->look_at = (this->placement.pos + (this->placement.size / 2.0f));
     this->placement.pos = (this->p_target_placement->pos + (((this->p_target_placement->size / 2.0f)))) - ((this->placement.size / 2.0f) / this->zoom);
-    //this->placement.velocity = this->p_target_placement->velocity;
 
     break;
   }
