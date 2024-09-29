@@ -1,4 +1,5 @@
 #include "camera.hpp"
+#include "client.hpp"
 
 void ct::camera::set_target(bicudo::physics::placement *p_placement) {
   if (p_placement == nullptr || p_placement == &this->placement) {
@@ -9,6 +10,7 @@ void ct::camera::set_target(bicudo::physics::placement *p_placement) {
 
   this->p_target_placement = p_placement;
   this->state = ct::camera_state::TARGET;
+  this->placement.pos = (this->p_target_placement->pos + (this->p_target_placement->size / 2.0f)) - (this->placement.size / 2.0f);
 }
 
 void ct::camera::on_update() {
@@ -24,7 +26,7 @@ void ct::camera::on_update() {
   this->zoom = bicudo::lerp<float>(
     this->zoom,
     this->interpolated_zoom,
-    bicudo::dt
+    0.3f
   );
 
   switch (this->state) {
@@ -36,8 +38,10 @@ void ct::camera::on_update() {
       return;
     }
 
-    this->look_at = this->p_target_placement->pos;
-    // please do this later
+    this->look_at = (this->placement.pos + (this->placement.size / 2.0f));
+    //this->placement.pos = (this->p_target_placement->pos + (this->p_target_placement->size / 2.0f)) - (this->placement.size / 2.0f);
+    this->placement.velocity = this->p_target_placement->velocity;
+
     break;
   }
 }

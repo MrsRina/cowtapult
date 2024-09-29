@@ -7,7 +7,9 @@ namespace ct {
   class entity_player : public entity_base {
   public:
     entity_player() = default;
-    entity_player(bicudo::physics::placement _placement) : entity_base(_placement) {};
+    entity_player(bicudo::physics::placement _placement) : entity_base(_placement) {
+      this->type = ct::entity_type::PLAYER;
+    };
 
     void on_update() override;
     void on_render() override;

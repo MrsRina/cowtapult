@@ -75,11 +75,8 @@ int32_t ct::run() {
   ct::p_app->running  = true;
   ekg::timing framerate_time_stamp {};
   bicudo::current_framerate = 60;
-  bicudo::dt = 0.16f;
 
-  double fixed_time {16};
-  double max_frame_time {0.25};
-  double previous_ticks {SDL_GetTicks64()};
+  double previous_ticks {static_cast<double>(SDL_GetTicks64() / 1000)};
   double current_ticks {};
   double frame_time {};
   double accumulator {};
@@ -108,16 +105,17 @@ int32_t ct::run() {
       ct::p_app->gui_manager.on_poll_event();
     }
 
-    current_ticks = SDL_GetTicks64();    
-    frame_time = std::chrono::duration<double>(current_ticks - previous_ticks).count();
+    /*
+    current_ticks = static_cast<double>(SDL_GetTicks64()) / 1000;
+    frame_time = current_ticks - previous_ticks;
     previous_ticks = current_ticks;
 
     accumulator += frame_time;
-    while (accumulator >= fixed_time) {
-      ct::p_app->world_manager.on_update();
-      accumulator -= fixed_time;
-    }
+    while (accumulator >= bicudo::dt) {
+      accumulator -= bicudo::dt;
+    }*/
 
+    ct::p_app->world_manager.on_update();
     ct::p_app->gui_manager.on_update();
     ekg::update();
 
@@ -127,9 +125,11 @@ int32_t ct::run() {
     }
 
     if (ekg::reach(framerate_time_stamp, 1000) && ekg::reset(framerate_time_stamp)) {
-      ekg::ui::dt = 1.0f / bicudo::current_framerate;
+      ekg::ui::dt = 1.0f / bicudo::current_framerate;\
+      bicudo::dt = ekg::ui::dt;
       bicudo::framerate = bicudo::current_framerate;
       bicudo::current_framerate = 0;
+      ekg::ui::redraw = true;
     }
 
     ct::p_app->gpu_handler.update_viewport();

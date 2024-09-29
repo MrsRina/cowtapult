@@ -9,14 +9,27 @@
 #define CT_NO_TEXTURE 969669
 
 namespace ct {
+  struct texture_upload_properties_t  {
+  public:
+    const char *p_tag {};
+    const char *p_path {};
+    bool repeated_uv {};
+  };
+
   class texture_manager {
   public:
     std::vector<ekg::gpu::sampler_t> sampler_list {};
   public:
     ekg::gpu::sampler_t &sampler(bicudo::id id);
-    bicudo::id upload(std::string_view tag, std::string_view path);
-    ct::result read_file(std::string_view path, ekg::gpu::sampler_t *p_sampler);
+    bicudo::id upload(ct::texture_upload_properties_t *p_texture_upload_properties);
   };
+}
+
+namespace ct {
+  ct::result media_create_sampler(
+    ekg::gpu::sampler_allocate_info *p_sampler_alloc_info,
+    ekg::gpu::sampler_t *p_sampler
+  );
 }
 
 #endif

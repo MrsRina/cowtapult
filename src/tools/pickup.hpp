@@ -1,8 +1,8 @@
 #ifndef CT_TOOLS_PICKUP_HPP
 #define CT_TOOLS_PICKUP_HPP
 
-#include "bicudo/physics/placement.hpp"
 #include "io/game_context.hpp"
+#include "world/entity_base.hpp"
 
 namespace ct {
   struct pickup_info_t {
@@ -10,7 +10,7 @@ namespace ct {
     bicudo::vec2 delta {};
     bicudo::vec2 pick_pos {};
     bicudo::vec2 prev_pos {};
-    bicudo::physics::placement *p_placement {};
+    ct::entity_base *p_entity_base {};
     ct::pickup_type pickup_type {};
   };
 }
@@ -20,8 +20,12 @@ namespace ct {
     bicudo::vec2 *p_vec
   );
 
-  bicudo::collided tools_pick_physics_placement(
-    bicudo::physics::placement *&p_placement,
+  void tools_to_world(
+    bicudo::vec2 *p_vec
+  );
+
+  bicudo::collided tools_pick_entity(
+    ct::entity_base *&p_entity_base,
     bicudo::vec2 pos
   );
 

@@ -45,6 +45,7 @@ void ct::immediate::create() {
           vec4 outColor = uColor;
           if (uSamplerEnabled) {
             outColor = texture(uSampler, vUV);
+            //outColor = texture(uSampler, vec2(fract(vUV.x * 144.0f), vUV.y));
           }
 
           vFragColor = outColor;

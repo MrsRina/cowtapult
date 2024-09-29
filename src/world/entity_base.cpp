@@ -1,7 +1,7 @@
 #include "entity_base.hpp"
 #include "client.hpp"
 
-void ct::entity_base::set_texuture(bicudo::id id) {
+void ct::entity_base::set_texture(bicudo::id id) {
   if (id == CT_NO_TEXTURE) {
     this->texture_id = 0;
   }

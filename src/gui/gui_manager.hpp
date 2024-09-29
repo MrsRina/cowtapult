@@ -9,6 +9,7 @@ namespace ct {
   public:
     ekg::runtime ekg_runtime {};
   public:
+    bicudo::id entity_target_sequence {};
     ct::pickup_info_t camera_pickup_info {};
     ct::pickup_info_t object_pickup_info {};
   public:

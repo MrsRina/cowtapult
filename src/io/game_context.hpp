@@ -7,10 +7,16 @@ namespace ct {
     TARGET 
   };
 
+  enum entity_type {
+    OBJECT,
+    PLAYER,
+    ENEMY
+  };
+
   enum pickup_type {
-    NONE,
-    DRAG,
-    SLINGSHOT
+    NONE      = 2 << 1,
+    DRAG      = 2 << 2,
+    SLINGSHOT = 2 << 3
   };
 }
 
