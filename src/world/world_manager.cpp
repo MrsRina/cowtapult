@@ -8,21 +8,99 @@ void ct::on_event_collision_pre_apply_forces(
   bicudo::physics::placement *&p_a,
   bicudo::physics::placement *&p_b
 ) {
-  if (p_a->p_tag[0] == 'T' || p_b->p_tag[0] == 'T') {
+  if (bicudo::assert_float(p_a->mass, 0.0f) || bicudo::assert_float(p_b->mass, 0.0f)) {
     return;
   }
 
-  float power {
-    (p_a->velocity * p_a->mass).magnitude()
+  bicudo::physics::placement *p_fractured_placement {
+    nullptr
   };
 
-  float resist {
-    (p_b->velocity * p_b->mass).magnitude() * (p_b->mass)
+  float m1 {};
+  float m2 {};
+  float total_mass {p_a->mass + p_b->mass};
+
+  bicudo::vec2 v1 {};
+  bicudo::vec2 v2 {};
+  float vdiff_sqrt {};
+
+  float sv1 {};
+  float sv2 {};
+
+  float e1 {};
+  float e2 {};
+  float kinetic {};
+
+  bicudo::vec2 c1 {};
+  bicudo::vec2 c2 {};
+
+  bicudo::vec2 start {ct::p_app->bicudo_runtime.collision_info.start * (p_b->mass / total_mass)};
+  bicudo::vec2 end {ct::p_app->bicudo_runtime.collision_info.end * (p_a->mass / total_mass)};
+  bicudo::vec2 p {start + end};
+
+  c1.x = p_a->pos.x + (p_a->size.x / 2);
+  c1.y = p_a->pos.y + (p_a->size.y / 2);
+  c1 = p - c1;
+    
+  c2.x = p_b->pos.x + (p_b->size.x / 2);
+  c2.y = p_b->pos.y + (p_b->size.y / 2);
+  c2 = p - c2;
+
+  v1 = (
+    p_a->velocity + bicudo::vec2(-1.0f * p_a->angular_velocity * c1.y, p_a->angular_velocity * c1.x)
+  );
+
+  v2 = (
+    p_b->velocity + bicudo::vec2(-1.0f * p_b->angular_velocity * c2.y, p_b->angular_velocity * c2.x)
+  );
+
+  float f1 {
+    (v1 * p_a->mass).magnitude()
   };
 
-  if (p_a->mass > p_b->mass && power > resist) {
-    std::cout << "oi eu amo gatos e vacas" << std::endl;
-    std::cout << power << ", " << resist << std::endl;
+  float f2 {
+    (v2* p_a->mass).magnitude()
+  };
+
+  bool which_check_to_destroy {
+    f1 > f2
+  };
+
+  switch (which_check_to_destroy) {
+  case 0:
+    m1 = p_a->mass;
+    m2 = p_b->mass;
+
+    sv1 = v1.magnitude();
+    sv2 = v2.magnitude();
+
+    p_fractured_placement = p_a;
+    break;
+  case 1:
+    m1 = p_b->mass;
+    m2 = p_a->mass;
+
+    // v2 > v1 then sv1 == v2
+    sv1 = v2.magnitude();
+    sv2 = v1.magnitude();
+
+    p_fractured_placement = p_b;
+    break;
+  }
+
+  e1 = 0.5f * m1 * sv1 * sv1;
+  e2 = 0.5f * m2 * sv2 * sv2;
+
+  vdiff_sqrt = (v2 - v1).magnitude();
+  kinetic = e1 + e2;
+
+  if (
+      (kinetic > p_fractured_placement->hardness)
+      &&
+      (!ekg_bitwise_contains(p_fractured_placement->flags, ct::collided_state::FRACTURED))
+    ) {
+    // now it is can be sub-divided
+    p_fractured_placement->flags = ct::collided_state::FRACTURED;
   }
 }
 
@@ -105,6 +183,7 @@ void ct::world_manager::on_load() {
         .mass = 60.0f,
         .friction = 0.6f,
         .restitution = 0.1f,
+        .hardness = 9999.0f,
         .pos = {20, 20},
         .size = {144, 144}
       }
@@ -122,6 +201,7 @@ void ct::world_manager::on_load() {
         .mass = 40.0f,
         .friction = 0.1f,
         .restitution = 0.2f,
+        .hardness = 10.0f,
         .pos = {20, 20},
         .size = {144, 144}
       }
@@ -139,6 +219,7 @@ void ct::world_manager::on_load() {
         .mass = 2.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
+        .hardness = 20.0f,
         .pos = {200, 20},
         .size = {400, 50}
       }

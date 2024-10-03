@@ -18,6 +18,10 @@ namespace ct {
     DRAG      = 2 << 2,
     SLINGSHOT = 2 << 3
   };
+
+  enum collided_state {
+    FRACTURED = 2 << 1
+  };
 }
 
 #endif
