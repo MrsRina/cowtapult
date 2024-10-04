@@ -222,7 +222,7 @@ void ct::world_manager::on_load() {
         .mass = 40.0f,
         .friction = 0.1f,
         .restitution = 0.2f,
-        .hardness = 200.0f,
+        .hardness = 160.0f,
         .pos = {20, 20},
         .size = {500, 500}
       }
@@ -372,13 +372,14 @@ void ct::world_manager::process_world_events(
         20.0f
       };
 
-      bicudo::vec2 size {
-        p_fractured->size / this->fract_amount
+      bicudo::vec2 center {
+        p_fractured->pos + (p_fractured->size / 2.0f) 
       };
 
       std::string tag {};
       tag += p_fractured->p_tag;
       tag += "-fracted";
+
       bicudo::physics::placement fract_placement {
         .p_tag = tag.c_str(),
         .flags = ct::collided_state::FRACTURED,
@@ -386,20 +387,23 @@ void ct::world_manager::process_world_events(
         .friction = p_fractured->friction,
         .restitution = p_fractured->restitution,
         .hardness = p_fractured->hardness,
-        .size = size,
+        .size = p_fractured->size / static_cast<float>(this->fract_amount),
         .velocity = p_fractured->velocity,
+        .angle = p_fractured->angle
       };
 
       int32_t row {};
       int32_t col {};
 
-      bicudo::vec2 relative {};
       for (int32_t it {}; it < (this->fract_amount * this->fract_amount); it++) {
         row = it / this->fract_amount;
         col = it % this->fract_amount;
 
-        fract_placement.pos.x = p_fractured->pos.x + col * size.x;
-        fract_placement.pos.y = p_fractured->pos.y + row * size.x;
+        fract_placement.pos.x = p_fractured->pos.x + col * fract_placement.size.x;
+        fract_placement.pos.y = p_fractured->pos.y + row * fract_placement.size.y;
+        fract_placement.pos = fract_placement.pos.rotate(fract_placement.angle, center);
+        fract_placement.angular_acc = p_fractured->angular_acc;
+        fract_placement.angular_velocity = p_fractured->angular_velocity;
 
         ct::entity_base *p_mini_fractured {
           new ct::entity_base(fract_placement)

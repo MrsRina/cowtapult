@@ -48,7 +48,7 @@ void ct::gui_manager::init() {
 
   ekg::label("Fract:", ekg::dock::next);
   ekg::slider<int32_t>("fract", ekg::dock::fill)
-    ->range<int32_t>(0, 5, 0, 16)
+    ->range<int32_t>(0, 4, 0, 16)
     ->range<int32_t>(0).i32.transfer_ownership(&ct::p_app->world_manager.fract_amount)
     ->set_text_align(ekg::dock::center | ekg::dock::left);
 
