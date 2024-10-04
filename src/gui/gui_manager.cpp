@@ -46,6 +46,12 @@ void ct::gui_manager::init() {
     ->range<float>(0).f32.transfer_ownership(&ct::p_app->bicudo_runtime.gravity.y)
     ->set_text_align(ekg::dock::center | ekg::dock::left);
 
+  ekg::label("Fract:", ekg::dock::next);
+  ekg::slider<int32_t>("fract", ekg::dock::fill)
+    ->range<int32_t>(0, 5, 0, 16)
+    ->range<int32_t>(0).i32.transfer_ownership(&ct::p_app->world_manager.fract_amount)
+    ->set_text_align(ekg::dock::center | ekg::dock::left);
+
   /*
   ekg::ui::textbox *p_terminal {
     ekg::textbox("terminal", "\0", ekg::dock::fill | ekg::dock::next)

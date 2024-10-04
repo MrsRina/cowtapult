@@ -22,6 +22,10 @@ namespace ct {
   enum collided_state {
     FRACTURED = 2 << 1
   };
+
+  enum event_type {
+    FRACTURE
+  };
 }
 
 #endif

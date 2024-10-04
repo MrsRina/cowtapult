@@ -8,7 +8,11 @@ void ct::on_event_collision_pre_apply_forces(
   bicudo::physics::placement *&p_a,
   bicudo::physics::placement *&p_b
 ) {
-  if (bicudo::assert_float(p_a->mass, 0.0f) || bicudo::assert_float(p_b->mass, 0.0f)) {
+  if (
+      (bicudo::assert_float(p_a->mass, 0.0f))
+      &&
+      (bicudo::assert_float(p_b->mass, 0.0f))
+    ) {
     return;
   }
 
@@ -59,12 +63,20 @@ void ct::on_event_collision_pre_apply_forces(
   };
 
   float f2 {
-    (v2* p_a->mass).magnitude()
+    (v2 * p_b->mass).magnitude()
   };
 
   bool which_check_to_destroy {
-    f1 > f2
+    (f1 > f2)
   };
+
+  if (bicudo::assert_float(p_a->mass, 0.0f)) {
+    which_check_to_destroy = 1;
+  }
+
+  if (bicudo::assert_float(p_b->mass, 0.0f)) {
+    which_check_to_destroy = 0;
+  }
 
   switch (which_check_to_destroy) {
   case 0:
@@ -95,12 +107,20 @@ void ct::on_event_collision_pre_apply_forces(
   kinetic = e1 + e2;
 
   if (
-      (kinetic > p_fractured_placement->hardness)
+      !(bicudo::assert_float(p_fractured_placement->mass, 0.0f))
       &&
       (!ekg_bitwise_contains(p_fractured_placement->flags, ct::collided_state::FRACTURED))
+      &&
+      (kinetic > p_fractured_placement->hardness)
     ) {
-    // now it is can be sub-divided
+    // now it is able to sub-divide
     p_fractured_placement->flags = ct::collided_state::FRACTURED;
+    ct::p_app->world_manager.in_world_event_poll.emplace(
+      ct::event_t {
+        .type = ct::event_type::FRACTURE,
+        .p_data = p_fractured_placement
+      }
+    );
   }
 }
 
@@ -180,10 +200,11 @@ void ct::world_manager::on_load() {
     new ct::entity_player(
       {
         .p_tag = "vakinha",
+        .flags = ct::collided_state::FRACTURED,
         .mass = 60.0f,
         .friction = 0.6f,
         .restitution = 0.1f,
-        .hardness = 9999.0f,
+        .hardness = 0.0f,
         .pos = {20, 20},
         .size = {144, 144}
       }
@@ -201,9 +222,9 @@ void ct::world_manager::on_load() {
         .mass = 40.0f,
         .friction = 0.1f,
         .restitution = 0.2f,
-        .hardness = 10.0f,
+        .hardness = 200.0f,
         .pos = {20, 20},
-        .size = {144, 144}
+        .size = {500, 500}
       }
     )
   };
@@ -219,7 +240,7 @@ void ct::world_manager::on_load() {
         .mass = 2.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
-        .hardness = 20.0f,
+        .hardness = 200.0f,
         .pos = {200, 20},
         .size = {400, 50}
       }
@@ -297,6 +318,103 @@ void ct::world_manager::on_load() {
   this->push_back_entity(p_terrain_right);
 }
 
+ct::entity_base *ct::world_manager::find_entity_by_id(
+  bicudo::id id,
+  uint64_t *p_index
+) {
+  for (uint64_t it {}; it < this->loaded_entity_list.size(); it++) {
+    ct::entity_base *&p_entities {
+      this->loaded_entity_list.at(it)
+    };
+
+    if (p_entities->placement.id == id) {
+      if (p_index != nullptr) {
+        *p_index = it;
+      }
+
+      return p_entities;
+    }
+  }
+
+  return nullptr;
+}
+
+bool ct::world_manager::erase_entity(bicudo::id id) {
+  for (uint64_t it {}; it < this->loaded_entity_list.size(); it++) {
+    ct::entity_base *&p_entities {
+      this->loaded_entity_list.at(it)
+    };
+
+    if (p_entities->placement.id == id) {
+      CT_FREE_ENTITY(p_entities, it);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void ct::world_manager::process_world_events(
+  ct::event_t *p_event
+) {
+  switch (p_event->type) {
+    case ct::event_type::FRACTURE: {
+      bicudo::physics::placement *p_fractured {
+        (bicudo::physics::placement*) p_event->p_data
+      };
+
+      uint64_t index {};
+      ct::entity_base *p_entity {
+        this->find_entity_by_id(p_fractured->id, &index)
+      };
+
+      float mass_div_by_n {
+        20.0f
+      };
+
+      bicudo::vec2 size {
+        p_fractured->size / this->fract_amount
+      };
+
+      std::string tag {};
+      tag += p_fractured->p_tag;
+      tag += "-fracted";
+      bicudo::physics::placement fract_placement {
+        .p_tag = tag.c_str(),
+        .flags = ct::collided_state::FRACTURED,
+        .mass = mass_div_by_n,
+        .friction = p_fractured->friction,
+        .restitution = p_fractured->restitution,
+        .hardness = p_fractured->hardness,
+        .size = size,
+        .velocity = p_fractured->velocity,
+      };
+
+      int32_t row {};
+      int32_t col {};
+
+      bicudo::vec2 relative {};
+      for (int32_t it {}; it < (this->fract_amount * this->fract_amount); it++) {
+        row = it / this->fract_amount;
+        col = it % this->fract_amount;
+
+        fract_placement.pos.x = p_fractured->pos.x + col * size.x;
+        fract_placement.pos.y = p_fractured->pos.y + row * size.x;
+
+        ct::entity_base *p_mini_fractured {
+          new ct::entity_base(fract_placement)
+        };
+
+        p_mini_fractured->pickup = ct::pickup_type::DRAG;
+        this->push_back_entity(p_mini_fractured);
+      }
+
+      CT_FREE_ENTITY(p_entity, index);
+      break;
+    }
+  }
+}
+
 void ct::world_manager::on_poll_event() {
   if (
     (ct::p_app->sdl_event.type == SDL_WINDOWEVENT)
@@ -314,13 +432,16 @@ void ct::world_manager::on_update() {
   for (ct::entity_base *&p_entity_base : this->loaded_entity_list) {
     p_entity_base->on_update();
   }
+
   ct::p_app->camera.on_update();
-
-
   bicudo::update_collisions(
     &ct::p_app->bicudo_runtime
   );
 
+  while (!this->in_world_event_poll.empty()) {
+    this->process_world_events(&this->in_world_event_poll.front());
+    this->in_world_event_poll.pop();
+  } 
 }
 
 void ct::world_manager::on_render() {
