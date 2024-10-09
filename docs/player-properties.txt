@@ -1,0 +1,15 @@
+# Basic Cow
+
+model = "cow.png"
+mass = 5.0f
+friction = 0.6f
+restitution = 0.1f
+hardness = 0.0f
+
+# Heavy Cow
+
+model = "cow-sun.png"
+mass = 1.0f
+friction = 0.6f
+restitution = 0.1f
+hardness = 0.0f

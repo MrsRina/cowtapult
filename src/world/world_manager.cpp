@@ -58,17 +58,10 @@ void ct::on_event_collision_pre_apply_forces(
     p_b->velocity + bicudo::vec2(-1.0f * p_b->angular_velocity * c2.y, p_b->angular_velocity * c2.x)
   );
 
-  float f1 {
-    (v1 * p_a->mass).magnitude()
-  };
+  m1 = p_a->mass;
+  m2 = p_b->mass;
 
-  float f2 {
-    (v2 * p_b->mass).magnitude()
-  };
-
-  bool which_check_to_destroy {
-    (f1 > f2)
-  };
+  bool which_check_to_destroy {};
 
   if (bicudo::assert_float(p_a->mass, 0.0f)) {
     which_check_to_destroy = 1;
@@ -78,11 +71,20 @@ void ct::on_event_collision_pre_apply_forces(
     which_check_to_destroy = 0;
   }
 
+  float f1 {
+    (v1 * m1).magnitude()
+  };
+
+  float f2 {
+    (v2 * m2).magnitude()
+  };
+
+  which_check_to_destroy = (
+    which_check_to_destroy || (f1 > f2)
+  );
+
   switch (which_check_to_destroy) {
   case 0:
-    m1 = p_a->mass;
-    m2 = p_b->mass;
-
     sv1 = v1.magnitude();
     sv2 = v2.magnitude();
 
@@ -100,8 +102,8 @@ void ct::on_event_collision_pre_apply_forces(
     break;
   }
 
-  e1 = 0.5f * m1 * sv1 * sv1;
-  e2 = 0.5f * m2 * sv2 * sv2;
+  e1 = m1 * sv1 * sv1;
+  e2 = m2 * sv2 * sv2;
 
   vdiff_sqrt = (v2 - v1).magnitude();
   kinetic = e1 + e2;
@@ -148,7 +150,7 @@ void ct::world_manager::on_load() {
     .repeated_uv = false
   };
 
-  bicudo::id dog_sampler {
+  bicudo::id dog_sampler_id {
     ct::p_app->texture_manager.upload(
       &upload_texture_properties
     )
@@ -157,7 +159,7 @@ void ct::world_manager::on_load() {
   upload_texture_properties.p_tag = "cow";
   upload_texture_properties.p_path = "./cow.png";
 
-  bicudo::id cow_sampler {
+  bicudo::id cow_sampler_id {
     ct::p_app->texture_manager.upload(
       &upload_texture_properties
     )
@@ -166,7 +168,7 @@ void ct::world_manager::on_load() {
   upload_texture_properties.p_tag = "soap";
   upload_texture_properties.p_path = "./soap.png";
 
-  bicudo::id soap_sampler {
+  bicudo::id soap_sampler_id {
     ct::p_app->texture_manager.upload(
       &upload_texture_properties
     )
@@ -176,7 +178,17 @@ void ct::world_manager::on_load() {
   upload_texture_properties.p_path = "./tile-terrain.png";
   upload_texture_properties.repeated_uv = false;
 
-  bicudo::id tile_terrain_sampler {
+  bicudo::id tile_terrain_sampler_id {
+    ct::p_app->texture_manager.upload(
+      &upload_texture_properties
+    )
+  };
+
+  upload_texture_properties.p_tag = "alien-snail.png";
+  upload_texture_properties.p_path = "./alien-snail.png";
+  upload_texture_properties.repeated_uv = false;
+
+  bicudo::id alien_snail_sampler_id {
     ct::p_app->texture_manager.upload(
       &upload_texture_properties
     )
@@ -201,25 +213,43 @@ void ct::world_manager::on_load() {
       {
         .p_tag = "vakinha",
         .flags = ct::collided_state::FRACTURED,
-        .mass = 60.0f,
+        .mass = 5.0f,
         .friction = 0.6f,
         .restitution = 0.1f,
         .hardness = 0.0f,
-        .pos = {20, 20},
+        .pos = {200, 20},
         .size = {144, 144}
       }
     )
   };
 
-  p_cow->set_texture(cow_sampler);
+  p_cow->set_texture(cow_sampler_id);
   p_cow->pickup = ct::pickup_type::DRAG | ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_cow);
+
+  ct::entity_player *p_alien_snail {
+    new ct::entity_player(
+      {
+        .p_tag = "alien-snail",
+        .mass = 2.0f,
+        .friction = 1.0f,
+        .restitution = 0.1f,
+        .hardness = 70.0f,
+        .pos = {5, 1},
+        .size = {64.0f, 64.0f}
+      }
+    )
+  };
+
+  p_alien_snail->set_texture(alien_snail_sampler_id);
+  p_alien_snail->pickup = ct::pickup_type::DRAG;
+  this->push_back_entity(p_alien_snail);
 
   ct::entity_player *p_soap {
     new ct::entity_player(
       {
         .p_tag = "sopa",
-        .mass = 40.0f,
+        .mass = 4.0f,
         .friction = 0.1f,
         .restitution = 0.2f,
         .hardness = 160.0f,
@@ -229,7 +259,7 @@ void ct::world_manager::on_load() {
     )
   };
 
-  p_soap->set_texture(soap_sampler);
+  p_soap->set_texture(soap_sampler_id);
   p_soap->pickup = ct::pickup_type::DRAG | ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_soap);
 
@@ -237,7 +267,7 @@ void ct::world_manager::on_load() {
     new ct::entity_player(
       {
         .p_tag = "gatinho",
-        .mass = 2.0f,
+        .mass = 4.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
         .hardness = 200.0f,
@@ -247,7 +277,7 @@ void ct::world_manager::on_load() {
     )
   };
 
-  p_cow_2->set_texture(dog_sampler);
+  p_cow_2->set_texture(dog_sampler_id);
   p_cow_2->pickup = ct::pickup_type::DRAG | ct::pickup_type::SLINGSHOT;
   p_cow_2->type = ct::entity_type::PLAYER;
   this->push_back_entity(p_cow_2);
@@ -266,7 +296,7 @@ void ct::world_manager::on_load() {
   };
 
   p_terrain_bottom->pickup = ct::pickup_type::DRAG;
-  p_terrain_bottom->set_texture(tile_terrain_sampler);
+  p_terrain_bottom->set_texture(tile_terrain_sampler_id);
   this->push_back_entity(p_terrain_bottom);
 
   ct::entity_base *p_terrain_top {
@@ -389,7 +419,7 @@ void ct::world_manager::process_world_events(
         .hardness = p_fractured->hardness,
         .size = p_fractured->size / static_cast<float>(this->fract_amount),
         .velocity = p_fractured->velocity,
-        .angle = p_fractured->angle
+        .angle = 0.0f
       };
 
       int32_t row {};
@@ -401,7 +431,7 @@ void ct::world_manager::process_world_events(
 
         fract_placement.pos.x = p_fractured->pos.x + col * fract_placement.size.x;
         fract_placement.pos.y = p_fractured->pos.y + row * fract_placement.size.y;
-        fract_placement.pos = fract_placement.pos.rotate(fract_placement.angle, center);
+        //fract_placement.pos = fract_placement.pos.rotate(fract_placement.angle, center);
         fract_placement.angular_acc = p_fractured->angular_acc;
         fract_placement.angular_velocity = p_fractured->angular_velocity;
 

@@ -3,6 +3,20 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
+bicudo::id ct::texture_manager::get_sampler_id_by_tag(const char *p_tag) {
+  for (bicudo::id it {}; it < this->sampler_list.size(); it++) {
+    ekg::gpu::sampler_t &sampler {
+      this->sampler_list.at(it)
+    };
+
+    if (strcmp(sampler.p_tag, p_tag) == 0) {
+      return it;
+    }
+  }
+
+  return CT_NO_TEXTURE;
+}
+
 ekg::gpu::sampler_t &ct::texture_manager::sampler(bicudo::id id) {
   return this->sampler_list.at(id);
 }

@@ -1,0 +1,17 @@
+# Basic Alien
+
+model = "alien.png"
+mass = 4.0f
+friction = 0.6f
+restitution = 0.1f
+hardness = 12.0f
+
+# Heavy Alien
+
+model = "alien-snail.png"
+mass = 2.0f
+friction = 1.0f
+restitution = 0.1f
+hardness = 70.0f
+size = {64.0f, 64.0f}
+
