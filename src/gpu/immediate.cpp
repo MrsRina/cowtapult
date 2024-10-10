@@ -1,4 +1,5 @@
 #include "immediate.hpp"
+#include <iostream>
 
 void ct::immediate::create() {
   ct::program_create_info program_create_info {
@@ -164,7 +165,7 @@ void ct::immediate::draw(
     color.data()
   );
 
-  if (bind_texture > 0 || bind_texture == this->was_sampler_activated) {
+  if (bind_texture > 0 || (this->was_sampler_activated > 0 && bind_texture == this->was_sampler_activated)) {
     glUniform1i(
       this->program["uSamplerEnabled"],
       true

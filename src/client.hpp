@@ -8,6 +8,7 @@
 #include "world/world_manager.hpp"
 #include "world/camera.hpp"
 #include "gui/gui_manager.hpp"
+#include "scene/scene_manager.hpp"
 
 namespace ct {
   extern struct application_t {
@@ -19,6 +20,7 @@ namespace ct {
     ct::world_manager world_manager {};
     ct::camera camera {};
     ct::gpu_handler gpu_handler {};
+    ct::scene_manager scene_manager {};
     SDL_Event sdl_event {};
     bool running {};
     uint64_t fps {};

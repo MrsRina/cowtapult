@@ -194,20 +194,6 @@ void ct::world_manager::on_load() {
     )
   };
 
-  ct::object *p_sling_body {
-    new ct::object(
-      {
-        .p_tag = "sling-body",
-        .mass = 0.0f,
-        .pos {20, 20},
-        .size = {10, 400}
-      }
-    )
-  };
-
-  p_sling_body->pickup = ct::pickup_type::DRAG;
-  this->push_back_entity(p_sling_body);
-
   ct::entity_player *p_cow {
     new ct::entity_player(
       {
@@ -223,129 +209,24 @@ void ct::world_manager::on_load() {
     )
   };
 
-  p_cow->set_texture(cow_sampler_id);
   p_cow->pickup = ct::pickup_type::DRAG | ct::pickup_type::SLINGSHOT;
   this->push_back_entity(p_cow);
 
-  ct::entity_player *p_alien_snail {
-    new ct::entity_player(
-      {
-        .p_tag = "alien-snail",
-        .mass = 2.0f,
-        .friction = 1.0f,
-        .restitution = 0.1f,
-        .hardness = 70.0f,
-        .pos = {5, 1},
-        .size = {64.0f, 64.0f}
-      }
-    )
-  };
-
-  p_alien_snail->set_texture(alien_snail_sampler_id);
-  p_alien_snail->pickup = ct::pickup_type::DRAG;
-  this->push_back_entity(p_alien_snail);
-
-  ct::entity_player *p_soap {
-    new ct::entity_player(
-      {
-        .p_tag = "sopa",
-        .mass = 4.0f,
-        .friction = 0.1f,
-        .restitution = 0.2f,
-        .hardness = 160.0f,
-        .pos = {20, 20},
-        .size = {500, 500}
-      }
-    )
-  };
-
-  p_soap->set_texture(soap_sampler_id);
-  p_soap->pickup = ct::pickup_type::DRAG | ct::pickup_type::SLINGSHOT;
-  this->push_back_entity(p_soap);
-
-  ct::entity_player *p_cow_2 {
-    new ct::entity_player(
-      {
-        .p_tag = "gatinho",
-        .mass = 4.0f,
-        .friction = 0.8f,
-        .restitution = 0.2f,
-        .hardness = 200.0f,
-        .pos = {200, 20},
-        .size = {400, 50}
-      }
-    )
-  };
-
-  p_cow_2->set_texture(dog_sampler_id);
-  p_cow_2->pickup = ct::pickup_type::DRAG | ct::pickup_type::SLINGSHOT;
-  p_cow_2->type = ct::entity_type::PLAYER;
-  this->push_back_entity(p_cow_2);
-
-  ct::entity_base *p_terrain_bottom {
+  ct::entity_base *p_bedrock {
     new ct::entity_base(
       {
-        .p_tag = "T",
+        .p_tag = "bedrock",
         .mass = 0.0f,
         .friction = 0.8f,
         .restitution = 0.2f,
-        .pos = {-600, 800},
-        .size = {3000000, 10000}
+        .pos = {0, 0},
+        .size = {CT_WORLD_LIMIT, CT_WORLD_LIMIT / 2.0f}
       }
     )
   };
 
-  p_terrain_bottom->pickup = ct::pickup_type::DRAG;
-  p_terrain_bottom->set_texture(tile_terrain_sampler_id);
-  this->push_back_entity(p_terrain_bottom);
-
-  ct::entity_base *p_terrain_top {
-    new ct::entity_base(
-      {
-        .p_tag = "T",
-        .mass = 0.0f,
-        .friction = 0.8f,
-        .restitution = 0.2f,
-        .pos = {600, 800},
-        .size = {1920, 50}
-      }
-    )
-  };
-
-  p_terrain_top->pickup = ct::pickup_type::DRAG;
-  this->push_back_entity(p_terrain_top);
-
-  ct::entity_base *p_terrain_left {
-    new ct::entity_base(
-      {
-        .p_tag = "T",
-        .mass = 0.0f,
-        .friction = 0.8f,
-        .restitution = 0.2f,
-        .pos = {-600, 200},
-        .size = {50, 1280}
-      }
-    )
-  };
-
-  p_terrain_left->pickup = ct::pickup_type::DRAG;
-  this->push_back_entity(p_terrain_left);
-
-  ct::entity_base *p_terrain_right {
-    new ct::entity_base(
-      {
-        .p_tag = "T",
-        .mass = 0.0f,
-        .friction = 0.8f,
-        .restitution = 0.2f,
-        .pos = {600 + 1920, 200},
-        .size = {50, 1280}
-      }
-    )
-  };
-
-  p_terrain_right->pickup = ct::pickup_type::DRAG;
-  this->push_back_entity(p_terrain_right);
+  p_bedrock->pickup = ct::pickup_type::DRAG;
+  this->push_back_entity(p_bedrock);
 }
 
 ct::entity_base *ct::world_manager::find_entity_by_id(
