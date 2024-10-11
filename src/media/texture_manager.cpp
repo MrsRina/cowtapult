@@ -3,6 +3,22 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
+void ct::texture_manager::on_pre_init() {
+  ct::texture_upload_properties_t upload {
+    .p_tag = "cow-loading",
+    .p_path = "./cow-loading.png"
+  };
+
+  this->upload(
+    &upload
+  );
+}
+
+void ct::texture_manager::on_init() {
+
+}
+
+
 bicudo::id ct::texture_manager::get_sampler_id_by_tag(const char *p_tag) {
   for (bicudo::id it {}; it < this->sampler_list.size(); it++) {
     ekg::gpu::sampler_t &sampler {

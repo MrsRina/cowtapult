@@ -6,7 +6,8 @@
 #include <vector>
 #include <queue>
 
-#define CT_WORLD_LIMIT 30000
+#define CT_WORLD_BEDROCK 20000
+#define CT_WORLD_LIMIT 500000
 #define CT_FREE_ENTITY(p_entity, index) bicudo::erase(&ct::p_app->bicudo_runtime, p_entity->placement.id); delete p_entity; p_entity = nullptr; this->loaded_entity_list.erase(this->loaded_entity_list.begin() + index)
 
 namespace ct {

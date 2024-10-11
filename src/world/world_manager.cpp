@@ -144,56 +144,6 @@ void ct::world_manager::on_load() {
   ct::p_app->bicudo_runtime.gravity = {0.0f, 9.81f};
   ct::p_app->bicudo_runtime.solve_accurace = 0.4f;
 
-  ct::texture_upload_properties_t upload_texture_properties {
-    .p_tag = "dog",
-    .p_path = "./dog.png",
-    .repeated_uv = false
-  };
-
-  bicudo::id dog_sampler_id {
-    ct::p_app->texture_manager.upload(
-      &upload_texture_properties
-    )
-  };
-
-  upload_texture_properties.p_tag = "cow";
-  upload_texture_properties.p_path = "./cow.png";
-
-  bicudo::id cow_sampler_id {
-    ct::p_app->texture_manager.upload(
-      &upload_texture_properties
-    )
-  };
-
-  upload_texture_properties.p_tag = "soap";
-  upload_texture_properties.p_path = "./soap.png";
-
-  bicudo::id soap_sampler_id {
-    ct::p_app->texture_manager.upload(
-      &upload_texture_properties
-    )
-  };
-
-  upload_texture_properties.p_tag = "tile-terrain";
-  upload_texture_properties.p_path = "./tile-terrain.png";
-  upload_texture_properties.repeated_uv = false;
-
-  bicudo::id tile_terrain_sampler_id {
-    ct::p_app->texture_manager.upload(
-      &upload_texture_properties
-    )
-  };
-
-  upload_texture_properties.p_tag = "alien-snail.png";
-  upload_texture_properties.p_path = "./alien-snail.png";
-  upload_texture_properties.repeated_uv = false;
-
-  bicudo::id alien_snail_sampler_id {
-    ct::p_app->texture_manager.upload(
-      &upload_texture_properties
-    )
-  };
-
   ct::entity_player *p_cow {
     new ct::entity_player(
       {
@@ -220,12 +170,16 @@ void ct::world_manager::on_load() {
         .friction = 0.8f,
         .restitution = 0.2f,
         .pos = {0, 0},
-        .size = {CT_WORLD_LIMIT, CT_WORLD_LIMIT / 2.0f}
+        .size = {CT_WORLD_LIMIT, CT_WORLD_LIMIT}
       }
     )
   };
 
-  p_bedrock->pickup = ct::pickup_type::DRAG;
+  p_bedrock->placement.pos = (
+    -(p_bedrock->placement.size / 2.0f)
+  );
+
+  p_bedrock->placement.pos.y = CT_WORLD_BEDROCK;
   this->push_back_entity(p_bedrock);
 }
 

@@ -1,6 +1,20 @@
 #include "gui_manager.hpp"
 #include "client.hpp"
 
+void ct::gui_manager::close(std::string_view tag) {
+  ct::gui *&p_gui {
+    this->gui_map[tag]
+  };
+
+  if (p_gui == nullptr) {
+    return;
+  }
+
+  p_gui->on_close();
+  delete p_gui;
+  p_gui = nullptr;
+}
+
 void ct::gui_manager::init() {
   ekg::input::bind("drag-object", "mouse-1");
   ekg::input::bind("drag-slingshot-object", "lshift+mouse-1");
@@ -10,6 +24,7 @@ void ct::gui_manager::init() {
   ekg::input::bind("zoom-camera", "mouse-wheel");
   ekg::input::bind("target-entity", "space-up");
 
+  /*
   ekg::frame("oiii muuu", {20, static_cast<float>(ct::p_app->window.h) - 700}, {400, 400})
     ->set_resize(ekg::dock::left | ekg::dock::bottom | ekg::dock::right | ekg::dock::top)
     ->set_drag(ekg::dock::full);
@@ -52,17 +67,14 @@ void ct::gui_manager::init() {
     ->range<int32_t>(0).i32.transfer_ownership(&ct::p_app->world_manager.fract_amount)
     ->set_text_align(ekg::dock::center | ekg::dock::left);
 
-  /*
-  ekg::ui::textbox *p_terminal {
-    ekg::textbox("terminal", "\0", ekg::dock::fill | ekg::dock::next)
-      ->set_scaled_height(8)
-      ->set_typing_state(ekg::state::disable)
-  };*/
-
   ekg::ui::label *p_position {ekg::label("", ekg::dock::next | ekg::dock::fill)};
 
   ekg::scrollbar("scrollbar-meow");
   ekg::pop_group();
+
+  */
+
+  this->open<ct::gui_loading>("loading-gui");
 }
 
 void ct::gui_manager::on_poll_event() {

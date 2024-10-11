@@ -59,8 +59,10 @@ void ct::init() {
     &ekg_runtime_property
   );
 
-  ct::p_app->world_manager.on_load();
+  ct::p_app->texture_manager.on_pre_init();
   ct::p_app->gui_manager.init();
+  ct::p_app->texture_manager.on_init();
+  ct::p_app->world_manager.on_load();
 }
 
 void ct::quit() {

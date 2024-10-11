@@ -20,6 +20,9 @@ namespace ct {
   public:
     std::vector<ekg::gpu::sampler_t> sampler_list {};
   public:
+    void on_pre_init();
+    void on_init();
+
     bicudo::id get_sampler_id_by_tag(const char *p_tag);
     ekg::gpu::sampler_t &sampler(bicudo::id id);
     bicudo::id upload(ct::texture_upload_properties_t *p_texture_upload_properties);
