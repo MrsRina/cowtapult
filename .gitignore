@@ -3,6 +3,7 @@
 
 # Compiled CMake makes
 /cmake-build-debug
+/cmake-build
 
 # Prerequisites
 *.d

@@ -11,6 +11,7 @@ namespace ct {
   public:
     ekg::runtime ekg_runtime {};
     std::unordered_map<std::string_view, ct::gui*> gui_map {};
+    std::string_view current_open_gui {};
   public:
     bicudo::id entity_target_sequence {};
     ct::pickup_info_t camera_pickup_info {};
@@ -18,6 +19,12 @@ namespace ct {
   public:
     template<typename t>
     void open(std::string_view tag) {
+      if (this->current_open_gui != "null") {
+        this->close(this->current_open_gui);
+      }
+
+      this->current_open_gui = tag;
+
       ct::gui *&p_gui {
         this->gui_map[tag]
       };

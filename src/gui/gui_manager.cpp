@@ -13,6 +13,8 @@ void ct::gui_manager::close(std::string_view tag) {
   p_gui->on_close();
   delete p_gui;
   p_gui = nullptr;
+
+  this->current_open_gui = "null";
 }
 
 void ct::gui_manager::init() {
@@ -75,9 +77,28 @@ void ct::gui_manager::init() {
   */
 
   this->open<ct::gui_loading>("loading-gui");
+  ct::gui_loading::progress  = 0.0f;
+
+  this->open<ct::gui_main_menu>("main-menu-gui");
 }
 
 void ct::gui_manager::on_poll_event() {
+  ct::gui *p_gui {
+    nullptr
+  };
+
+  if (
+      (ct::p_app->sdl_event.type == SDL_WINDOWEVENT)
+      &&
+      (ct::p_app->sdl_event.window.event == SDL_WINDOWEVENT_RESIZED)
+      &&
+      this->current_open_gui != "null"
+      &&
+      (p_gui = this->gui_map[this->current_open_gui]) != nullptr
+  ) {
+    p_gui->on_screen_change_size();
+  }
+
   ct::tools_pick_camera(
     &this->camera_pickup_info
   );

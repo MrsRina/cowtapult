@@ -14,7 +14,7 @@
    		{
    			"initializationOptions":
    	 		{
-	   			"clangd.compile-commands-dir": "./cmake-build-debug"
+	   			"clangd.compile-commands-dir": "./cmake-build"
    			}
    		}
    	}
@@ -24,7 +24,7 @@
    	{
    		"name": "Build-&-Run",
    		"shell_cmd":
-   			"cd $folder && cmake -S . -B ./cmake-build-debug -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 && cmake --build ./cmake-build-debug && cd ./bin && ./cowtapult"
+   			"cd $folder && cmake -S . -B ./cmake-build -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 && cmake --build ./cmake-build && cd ./bin && ./cowtapult"
    	}	
   ]
 }

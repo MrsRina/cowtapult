@@ -85,12 +85,6 @@ int32_t ct::run() {
 
   while (ct::p_app->running) {
     while (SDL_PollEvent(&ct::p_app->sdl_event)) {
-      ekg::os::sdl_poll_event(ct::p_app->sdl_event);
-
-      if (ct::p_app->sdl_event.type == SDL_QUIT) {
-        ct::p_app->running = false;
-      }
-
       if (
           (ct::p_app->sdl_event.type == SDL_WINDOWEVENT)
           &&
@@ -103,8 +97,14 @@ int32_t ct::run() {
         ekg::ui::height = ct::p_app->window.h;
       }
 
-      ct::p_app->world_manager.on_poll_event();
       ct::p_app->gui_manager.on_poll_event();
+      ekg::os::sdl_poll_event(ct::p_app->sdl_event);
+
+      if (ct::p_app->sdl_event.type == SDL_QUIT) {
+        ct::p_app->running = false;
+      }
+
+      ct::p_app->world_manager.on_poll_event();
     }
 
     /*
@@ -127,7 +127,7 @@ int32_t ct::run() {
     }
 
     if (ekg::reach(framerate_time_stamp, 1000) && ekg::reset(framerate_time_stamp)) {
-      ekg::ui::dt = 1.0f / bicudo::current_framerate;\
+      ekg::ui::dt = 1.0f / bicudo::current_framerate;
       bicudo::dt = ekg::ui::dt;
       bicudo::framerate = bicudo::current_framerate;
       bicudo::current_framerate = 0;

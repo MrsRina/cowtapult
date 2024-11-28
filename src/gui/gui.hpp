@@ -16,6 +16,15 @@ namespace ct {
 
   class gui_loading : public ct::gui {
   public:
+    static float progress;
+  public:
+    void on_open() override;
+    void on_screen_change_size() override;
+    void on_close() override;
+  };
+
+  class gui_main_menu : public ct::gui {
+  public:
     void on_open() override;
     void on_screen_change_size() override;
     void on_close() override;
